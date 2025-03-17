@@ -19,13 +19,33 @@ const reducer = (state, action) => {
   }
 };
 
-export default function TodoForm() {
+export default function TodoForm(createNewTodo) {
 
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const onLabelChange = ({ target: { value }}) => {
+    dispatch({ type: CHANGE_LABEL, payload: value })
+  };
+
+  const onIsCompletedChange =({ target: { checked }}) => {
+    dispatch({ type: CHANGE_IS_COMPLETED, payload: checked })
+  };
+
+  const resetForm = () => {
+    dispatch({ type: CHANGE_LABEL, payload: '' })
+    dispatch({ type: CHANGE_IS_COMPLETED, payload: false })
+  };
+
+  const onNewTodo = evt => {
+    evt.preventDefault(); 
+
+    createNewTodo(state.todoLabel, state.todoIsCompleted)
+    resetForm();
+  }
   
   
   return (
-    <form id="todoForm">
+    <form id="todoForm" onSubmit={onNewTodo}>
       <h3>New Todo Form</h3>
       <label><span>Todo label:</span>
         <input
@@ -41,13 +61,15 @@ export default function TodoForm() {
           onChange={onIsCompletedChange}
           type='checkbox'
           name='todoIsCompleted'
+          checked={state.todoLabel}
         />
       </label>
       <label><span>Create todo:</span>
         <input
-          checked={state.todoIsCompleted}
+          disabled={!state.todoLabel.trim()}
           type='submit'
           value='Do it!'
+
         />
       </label>
     </form>
